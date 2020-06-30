@@ -51,12 +51,3 @@ template void Log::println(Level, char * );
 template void Log::println(Level, std::string );
 template void Log::println(Level, float );
 template void Log::println(Level, int );
-
-void Log::check(int result, const char *op)
-{
-    if (result != 0)
-    {
-        print( warning, "Operation failed: " );
-        println( warning, op );
-    }
-}

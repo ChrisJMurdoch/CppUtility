@@ -22,5 +22,12 @@ public:
     static void println(Level level, T message);
 
     /** Print warning if given anything other than 0 */
-    static void check(int result, const char *op);
+    static inline void check(int result, const char *op)
+    {
+        if (result != 0)
+        {
+            print( warning, "Operation failed: " );
+            println( warning, op );
+        }
+    }
 };
