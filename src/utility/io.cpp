@@ -3,40 +3,39 @@
 
 #include <fstream>
 
+std::vector<std::string> split( std::string line, char d1 ) { return split(line, d1, d1); }
 std::vector<std::string> split( std::string line, char d1, char d2 )
 {
     // Get character array
     const char *array = line.c_str();
 
-    static std::vector<std::string> words;
-    words.clear();
+    // Collect delimited words in line
+    std::vector<std::string> words;
 
     // Iterate through characters
     int i = 0;
     char c = array[i++];
-    bool done = false;
-    while ( !done )
+    while ( true )
     {
         std::vector<char> word;
 
+        // Build up word
         while ( c != d1 && c != d2 && c != '\0' )
         {
-            
             word.push_back(c);
             c = array[i++];
         }
+
+        // End string with null terminator
         word.push_back('\0');
 
+        // Add word to vector if not just null terminator
         if ( word.size() > 1 )
-        {
             words.push_back( std::string( &word[0] ) );
-        }
 
+        // Escape if end of string
         if ( c == '\0' )
-        {
-            done = true;
-            continue;
-        }
+            break;
 
         c = array[i++];
     }
@@ -44,31 +43,7 @@ std::vector<std::string> split( std::string line, char d1, char d2 )
     return words;
 }
 
-void divide(std::string input, char delimiter, std::string &a, std::string &b)
-{
-    // Get character array
-    const char *array = input.c_str();
-
-    // Get delimiter location
-    int i = 0, d = -1;
-    while ( array[i++] != '\0' )
-    {
-        if ( array[i] == delimiter )
-        {
-            d = i;
-            break;
-        }
-    }
-    
-    if ( d==-1 )
-        throw "Delimiter not found";
-
-    // Create substrings
-    a = input.substr (0, d);
-    b = input.substr (d+1, input.length()-d-1);
-}
-
-std::map<std::string, std::string> mapFile(const char *filename)
+std::map<std::string, std::string> readKVAL(const char *filename)
 {
     // Open file
     std::ifstream file (filename);
@@ -82,18 +57,17 @@ std::map<std::string, std::string> mapFile(const char *filename)
     {
         try
         {
-            std::string key, val;
-            divide( line, ':', key, val );
-            map[key] = val;
+            std::vector<std::string> kv = split( line, ':' );
+            map[ kv[0] ] = kv[1];
         }
-        catch ( char const* e ) {}
+        catch ( char const* e ) {} // Ignore empty or invalid lines
     }
     file.close();
 
     return map;
 }
 
-std::vector<float> vertexFile(const char *filename)
+std::vector<float> readVDAT(const char *filename)
 {
     // Open file
     std::ifstream file (filename);
